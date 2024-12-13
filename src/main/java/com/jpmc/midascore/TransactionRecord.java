@@ -17,6 +17,8 @@ public class TransactionRecord {
 
     private float amount;
 
+    private float incentive;
+
     public TransactionRecord(UserRecord sender, UserRecord recipient, float amount) {
         this.sender = sender;
         this.recipient = recipient;
@@ -33,6 +35,10 @@ public class TransactionRecord {
 
     public void setAmount(float amount) {
         this.amount = amount;
+    }
+
+    public void setIncentive(float incentive) {
+        this.incentive = incentive;
     }
 
 }

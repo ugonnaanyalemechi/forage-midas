@@ -1,5 +1,6 @@
 package com.jpmc.midascore;
 
+import com.jpmc.midascore.entity.Incentive;
 import com.jpmc.midascore.entity.UserRecord;
 import com.jpmc.midascore.foundation.Transaction;
 import com.jpmc.midascore.repository.TransactionRecordRepository;
@@ -32,15 +33,19 @@ import java.util.Optional;
         Optional<UserRecord> optionalRecipient = Optional.ofNullable(userRepository.findById(transaction.getRecipientId()));
         UserRecord recipient = optionalRecipient .orElse(null);
 
+        // validate transaction
         if (sender != null && recipient != null && sender.getBalance() >= transaction.getAmount()) {
-            sender.setBalance(sender.getBalance() - transaction.getAmount());
-            recipient.setBalance(recipient.getBalance() + transaction.getAmount());
+            Incentive incentive = IncentiveService.getIncentive(transaction);
 
-            userRepository.save(sender);
-            userRepository.save(recipient);
+            sender.setBalance(sender.getBalance() - transaction.getAmount());
+            recipient.setBalance(recipient.getBalance() + transaction.getAmount() + Incentive.getAmount());
 
             TransactionRecord transactionRecord = new TransactionRecord(sender, recipient, transaction.getAmount());
-            System.out.println("Transaction stored: \n\tSender: " + sender.getName() + "\n\tRecipient: " + recipient.getName() + "\n\tAmount: " + transaction.getAmount());
+            transactionRecord.setIncentive(Incentive.getAmount());
+
+            System.out.printf("Transaction stored: \n\tSender: " + sender.getName() + "\n\tRecipient: " + recipient.getName() + "\n\tAmount: " + "%.2f%n", transaction.getAmount());
+            userRepository.save(sender);
+            userRepository.save(recipient);
             transactionRecordRepository.save(transactionRecord);
         }
 
